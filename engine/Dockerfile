@@ -4,13 +4,24 @@
 #   docker tag docker.m.daocloud.io/library/python:3.13-slim python:3.13-slim
 FROM python:3.13-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# 中国大陆构建加速：--build-arg USE_CN_MIRROR=true（切换 apt / pypi 到阿里云镜像）
+ARG USE_CN_MIRROR=false
+
+RUN if [ "$USE_CN_MIRROR" = "true" ]; then \
+        sed -i 's@deb.debian.org@mirrors.aliyun.com@g; s@security.debian.org@mirrors.aliyun.com@g' \
+            /etc/apt/sources.list.d/debian.sources /etc/apt/sources.list 2>/dev/null || true; \
+    fi \
+    && apt-get update && apt-get install -y --no-install-recommends \
         ffmpeg fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN if [ "$USE_CN_MIRROR" = "true" ]; then \
+        pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt; \
+    else \
+        pip install --no-cache-dir -r requirements.txt; \
+    fi
 
 COPY app/ ./app/
 
