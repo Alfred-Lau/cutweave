@@ -9,8 +9,7 @@ sys.path.insert(0, str(ROOT))
 
 TEST_DATA = ROOT / ".testdata"
 os.environ["LG_DATA_DIR"] = str(TEST_DATA)
-os.environ.setdefault("LG_FFMPEG", "/opt/homebrew/bin/ffmpeg")
-os.environ.setdefault("LG_FFPROBE", "/opt/homebrew/bin/ffprobe")
+# ffmpeg/ffprobe 不在此硬编码：app.config 会按 环境变量 → PATH → 平台默认 顺序解析
 
 
 def pytest_sessionstart(session):
