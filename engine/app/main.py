@@ -20,8 +20,8 @@ from .probe import ProbeError, probe
 from .store import DraftNotFound
 from .tts import TTSError, synthesize
 
-app = FastAPI(title="Liuguang Video Engine", version="0.1.0",
-              description="流光剪影 P0 引擎：草稿 CRUD + FFmpeg 云渲染 + TTS")
+app = FastAPI(title="CutWeave Engine", version="0.1.0",
+              description="CutWeave P0 引擎：草稿 CRUD + FFmpeg 云渲染 + TTS")
 
 RENDER_JOBS: dict[str, dict] = {}  # P0 内存态；P1 迁移到任务总线
 

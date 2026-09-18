@@ -1,4 +1,4 @@
-# 流光剪影引擎 P0 —— Linux 容器（Debian slim + ffmpeg + Noto CJK 字体）
+# CutWeave P0 —— Linux 容器（Debian slim + ffmpeg + Noto CJK 字体）
 # 拉取官方镜像困难时，可先从镜像加速源获取并打 tag，例如：
 #   docker pull docker.m.daocloud.io/library/python:3.13-slim
 #   docker tag docker.m.daocloud.io/library/python:3.13-slim python:3.13-slim

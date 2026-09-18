@@ -78,13 +78,13 @@ def main() -> int:
         api("POST", f"/api/v1/drafts/{draft_id}/videos",
             {"url": str(bg), "start": 0, "end": 10, "level": 0})
         tts = api("POST", "/api/v1/ai/tts",
-                  {"text": "你好，这是流光剪影引擎的第一条自动生成视频"})
+                  {"text": "你好，这是 CutWeave 引擎的第一条自动生成视频"})
         print(f"[4/6] TTS 完成（engine={tts['engine']}，{tts['duration']:.1f}s）")
         api("POST", f"/api/v1/drafts/{draft_id}/audios",
             {"url": tts["file_path"], "start": 0.5,
              "end": 0.5 + min(tts["duration"], 9.0)})
         api("POST", f"/api/v1/drafts/{draft_id}/texts",
-            {"text": "流光剪影 · P0", "start": 0, "end": 6, "font_size": 72})
+            {"text": "CutWeave · P0", "start": 0, "end": 6, "font_size": 72})
         api("POST", f"/api/v1/drafts/{draft_id}/texts",
             {"text": "第一条全自动生成的视频", "start": 2, "end": 8, "font_size": 48,
              "y": 200})

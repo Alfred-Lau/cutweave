@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Liuguang Video Engine",
-    "description": "流光剪影 P0 引擎：草稿 CRUD + FFmpeg 云渲染 + TTS",
+    "title": "CutWeave Engine",
+    "description": "CutWeave P0 引擎：草稿 CRUD + FFmpeg 云渲染 + TTS",
     "version": "0.1.0"
   },
   "paths": {

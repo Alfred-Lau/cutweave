@@ -1,7 +1,7 @@
-# 流光剪影引擎（P0）
+# CutWeave · 云端视频剪辑引擎（P0）
 
 对标「流光剪辑」的自建云端视频生产引擎，P0 阶段：草稿 CRUD + FFmpeg 同步渲染 + TTS。
-架构设计见项目根目录《个人云端视频生产系统架构设计.html》。
+整体架构与路线图见仓库根 README.md。
 
 ## 目录
 
@@ -32,7 +32,7 @@ docker compose logs -f              # 看日志
 docker compose down                 # 停止（数据保留在 engine-data 卷）
 ```
 
-镜像基于 `python:3.14-slim`，自带 ffmpeg 与 Noto CJK 中文字体；草稿/素材/成片持久化在 `engine-data` 卷。
+镜像基于 `python:3.13-slim`，自带 ffmpeg 与 Noto CJK 中文字体；草稿/素材/成片持久化在 `engine-data` 卷。
 注意：容器为 Linux 环境，`mac_say` TTS 兜底不可用，TTS 仅 edge_tts（需联网）。
 
 ## API 一览（/api/v1）

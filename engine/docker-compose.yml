@@ -1,8 +1,8 @@
 services:
-  liuguang-engine:
+  cutweave:
     build: .
-    image: liuguang-engine:0.1.0
-    container_name: liuguang-engine
+    image: cutweave:0.1.0
+    container_name: cutweave
     ports:
       - "8390:8390"
     volumes:
