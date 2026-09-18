@@ -1,0 +1,13 @@
+services:
+  liuguang-engine:
+    build: .
+    image: liuguang-engine:0.1.0
+    container_name: liuguang-engine
+    ports:
+      - "8390:8390"
+    volumes:
+      - engine-data:/data
+    restart: unless-stopped
+
+volumes:
+  engine-data:

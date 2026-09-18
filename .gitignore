@@ -1,0 +1,9 @@
+# 运行时数据与本地环境不入仓库
+.runtime/
+.skills/
+engine/.venv/
+engine/data/
+engine/.testdata/
+engine/.pytest_cache/
+**/__pycache__/
+.DS_Store

@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic>=2
+edge-tts
+httpx
+pytest
+python-multipart
+Pillow
