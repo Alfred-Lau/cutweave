@@ -347,3 +347,8 @@ async def ai_voice_delete(voice_id: str):
 
 ensure_dirs()
 app.mount("/files", StaticFiles(directory=DATA_DIR), name="files")
+
+# 图形化控制台（同端口同源，无 CORS 问题）
+UI_DIR = Path(__file__).resolve().parent.parent / "ui"
+UI_DIR.mkdir(exist_ok=True)
+app.mount("/ui", StaticFiles(directory=UI_DIR, html=True), name="ui")

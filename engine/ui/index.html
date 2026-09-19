@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CutWeave 控制台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">🎬 CutWeave 控制台</div>
+  <div class="badges">
+    <span class="badge" id="b-font"><i></i>中文字体</span>
+    <span class="badge" id="b-volc"><i></i>火山 TTS</span>
+    <span class="badge" id="b-cosy"><i></i>CosyVoice</span>
+  </div>
+</header>
+
+<nav id="main-nav">
+  <button data-tab="drafts" class="active">草稿工作台</button>
+  <button data-tab="tts">TTS 工坊</button>
+  <button data-tab="voices">声音库</button>
+</nav>
+
+<main>
+
+  <!-- ============ 草稿工作台 ============ -->
+  <section id="tab-drafts" class="tab active">
+    <aside>
+      <div class="card">
+        <h3>新建草稿</h3>
+        <label>名称</label>
+        <input id="d-name" placeholder="例如：双11 口播 v1">
+        <label>画布尺寸</label>
+        <select id="d-size">
+          <option value="720x1280" selected>720×1280 竖屏 9:16</option>
+          <option value="1080x1920">1080×1920 竖屏高清</option>
+          <option value="1920x1080">1920×1080 横屏 16:9</option>
+          <option value="1280x720">1280×720 横屏</option>
+        </select>
+        <label>帧率</label>
+        <select id="d-fps">
+          <option value="30" selected>30</option>
+          <option value="24">24</option>
+          <option value="25">25</option>
+          <option value="60">60</option>
+        </select>
+        <button class="primary block" id="d-create">创建草稿</button>
+      </div>
+      <div class="card">
+        <h3>草稿列表</h3>
+        <ul id="draft-list" class="draft-list"><li class="dim">加载中…</li></ul>
+      </div>
+    </aside>
+
+    <div class="editor">
+      <div id="editor-empty" class="empty">← 从左侧选择一个草稿，或新建一个开始创作</div>
+
+      <div id="editor" hidden>
+        <div class="editor-head">
+          <div>
+            <h2 id="ed-name"></h2>
+            <span class="dim" id="ed-meta"></span>
+          </div>
+          <button class="primary" id="ed-render">🚀 一键渲染</button>
+        </div>
+
+        <div class="card">
+          <h3>时间线 <span class="dim" id="ed-duration"></span></h3>
+          <div id="timeline"></div>
+          <p class="hint">点击色块可删除该片段；色块宽度 = 片段时长占比</p>
+        </div>
+
+        <div class="card">
+          <div class="sub-nav" id="add-nav">
+            <button data-sub="video" class="active">➕ 视频 / 图片</button>
+            <button data-sub="audio">➕ 音频</button>
+            <button data-sub="text">➕ 文字</button>
+          </div>
+
+          <form id="form-video" class="add-form">
+            <div class="grid2">
+              <div class="span2"><label>素材 URL 或服务器路径 *</label><input name="url" placeholder="https://... 或 /data/assets/demo.mp4" required></div>
+              <div><label>开始(秒) *</label><input name="start" type="number" step="0.1" value="0" required></div>
+              <div><label>结束(秒)</label><input name="end" type="number" step="0.1" placeholder="留空=素材播完"></div>
+              <div><label>时长(秒)</label><input name="duration" type="number" step="0.1" placeholder="或直接给时长"></div>
+              <div><label>素材内起点(秒)</label><input name="source_in" type="number" step="0.1" value="0"></div>
+              <div><label>层级 level</label><input name="level" type="number" value="0" title="0=主轨铺满，>0 画中画"></div>
+              <div><label>X</label><input name="x" type="number" value="0"></div>
+              <div><label>Y</label><input name="y" type="number" value="0"></div>
+              <div><label>缩放</label><input name="scale" type="number" step="0.05" value="1"></div>
+              <div><label>不透明度</label><input name="alpha" type="number" step="0.05" min="0.05" max="1" value="1"></div>
+            </div>
+            <div class="form-foot">
+              <button type="button" class="ghost" id="btn-probe">🔍 探测素材</button>
+              <span id="probe-out" class="dim"></span>
+              <button type="submit" class="primary">添加到时间线</button>
+            </div>
+          </form>
+
+          <form id="form-audio" class="add-form" hidden>
+            <div class="grid2">
+              <div class="span2"><label>音频 URL 或服务器路径 *</label><input name="url" placeholder="/data/tts/tts_xxx.mp3（可先在 TTS 工坊生成）" required></div>
+              <div><label>开始(秒) *</label><input name="start" type="number" step="0.1" value="0" required></div>
+              <div><label>结束(秒)</label><input name="end" type="number" step="0.1" placeholder="留空=播完整段"></div>
+              <div><label>时长(秒)</label><input name="duration" type="number" step="0.1"></div>
+              <div><label>素材内起点(秒)</label><input name="source_in" type="number" step="0.1" value="0"></div>
+              <div><label>音量</label><input name="volume" type="number" step="0.1" min="0" max="2" value="1"></div>
+            </div>
+            <div class="form-foot">
+              <span class="hint">💡 没有音频？去「TTS 工坊」生成配音后一键插入</span>
+              <button type="submit" class="primary">添加到时间线</button>
+            </div>
+          </form>
+
+          <form id="form-text" class="add-form" hidden>
+            <div class="grid2">
+              <div class="span2"><label>文字内容 *</label><input name="text" placeholder="字幕 / 标题文案" required></div>
+              <div><label>开始(秒) *</label><input name="start" type="number" step="0.1" value="0" required></div>
+              <div><label>结束(秒) *</label><input name="end" type="number" step="0.1" value="5" required></div>
+              <div><label>字号</label><input name="font_size" type="number" value="64"></div>
+              <div><label>颜色</label>
+                <select name="font_color">
+                  <option value="white" selected>白色</option>
+                  <option value="black">黑色</option>
+                  <option value="yellow">黄色</option>
+                  <option value="red">红色</option>
+                  <option value="#FFD700">金色</option>
+                </select>
+              </div>
+              <div><label>描边颜色</label>
+                <select name="border_color">
+                  <option value="">无</option>
+                  <option value="black">黑</option>
+                  <option value="white">白</option>
+                </select>
+              </div>
+              <div><label>Y 位置(px)</label><input name="y" type="number" value="0" title="0=底部120px处；其他=距顶部像素"></div>
+            </div>
+            <div class="form-foot">
+              <button type="submit" class="primary">添加到时间线</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card" id="render-result" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TTS 工坊 ============ -->
+  <section id="tab-tts" class="tab">
+    <div class="card wide">
+      <h3>文本转语音</h3>
+      <label>文案（支持 2000 字以上，超过 400 字自动分段合成后无缝拼接）</label>
+      <textarea id="tts-text" rows="8" placeholder="输入要合成的文案…"></textarea>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <label>引擎</label>
+          <select id="tts-engine">
+            <option value="edge_tts" selected>edge_tts（免费，微软音色）</option>
+            <option value="volcengine">volcengine（火山豆包，需配置凭证）</option>
+            <option value="cosyvoice">cosyvoice（阿里百炼，需配置凭证）</option>
+          </select>
+        </div>
+        <div>
+          <label>音色 voice（可留空用默认）</label>
+          <input id="tts-voice" list="voice-options" placeholder="火山: S_xxx / zh_female_xxx；克隆音色可直接选">
+          <datalist id="voice-options"></datalist>
+        </div>
+      </div>
+      <div class="form-foot">
+        <span id="tts-status" class="dim"></span>
+        <button class="primary" id="tts-go">🔊 合成语音</button>
+      </div>
+      <div id="tts-result" hidden>
+        <audio id="tts-audio" controls style="width:100%"></audio>
+        <div class="form-foot">
+          <span class="dim" id="tts-meta"></span>
+          <a id="tts-download" class="ghost" download>⬇️ 下载音频</a>
+        </div>
+        <div class="insert-box" id="tts-insert">
+          <h4>插入当前草稿：<span id="tts-target" class="dim">未选择</span></h4>
+          <div class="grid2">
+            <div><label>开始(秒)</label><input id="ins-start" type="number" step="0.1" value="0"></div>
+            <div><label>时长(秒)</label><input id="ins-duration" type="number" step="0.1" placeholder="留空=整段"></div>
+          </div>
+          <button class="primary" id="ins-go">插到音频轨</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 声音库 ============ -->
+  <section id="tab-voices" class="tab">
+    <div class="card wide">
+      <h3>用你自己的声音</h3>
+      <p>推荐走<strong>火山引擎控制台</strong>的声音复刻（效果最佳，音色只在平台侧训练一次）：</p>
+      <ol class="steps">
+        <li>登录火山引擎控制台 → 语音技术 → <strong>声音复刻</strong></li>
+        <li>上传 10-20 秒安静环境的清晰人声录音，等待训练完成</li>
+        <li>复制 <code>S_</code> 开头的<strong>声音 ID</strong></li>
+        <li>回到「TTS 工坊」→ 引擎选 volcengine → voice 填这个 ID → 任意文案都是你的声音</li>
+      </ol>
+      <p class="hint">官方预置音色（如 zh_female_cmlccs_moon_bigtts）需在控制台对音色开通（多数 0 元）。</p>
+    </div>
+    <div class="card wide">
+      <h3>已登记的克隆音色（CosyVoice 路径）</h3>
+      <ul id="voices-list" class="voice-list"><li class="dim">加载中…</li></ul>
+    </div>
+  </section>
+
+</main>
+
+<div id="toast" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
