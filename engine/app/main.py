@@ -13,7 +13,9 @@ from pydantic import BaseModel, Field, RootModel, ValidationError
 
 from . import store
 from .compiler import CompileError, _download, build_command, prepare_materials, run_ffmpeg
-from .config import DATA_DIR, DEFAULT_FONT, RENDERS_DIR, ensure_dirs
+from . import voiceclone
+from .config import (DATA_DIR, DEFAULT_FONT, DASHSCOPE_API_KEY,
+                     RENDERS_DIR, VOLC_TTS_APPID, VOLC_TTS_TOKEN, ensure_dirs)
 from .models import (Draft, KIND_TRACK_TYPE, Material, Segment, TextStyle, Transform,
                      new_id, RESOURCE_KIND)
 from .probe import ProbeError, probe
@@ -80,7 +82,8 @@ class PatchSegReq(BaseModel):
 class TTSReq(BaseModel):
     text: str
     voice: Optional[str] = None
-    engine: Literal["edge_tts", "mac_say"] = "edge_tts"
+    engine: Literal["edge_tts", "mac_say", "cosyvoice", "volcengine"] = "edge_tts"
+    model: Optional[str] = None  # cosyvoice 模型名；其他引擎忽略
 
 
 class RenderReq(BaseModel):
@@ -165,7 +168,9 @@ def _patch_segment(draft: Draft, kind: str, segment_id: str, req: PatchSegReq) -
 @app.get("/api/v1/health")
 async def health():
     return {"status": "ok", "font_ready": DEFAULT_FONT is not None,
-            "font": DEFAULT_FONT or "未找到中文字体"}
+            "font": DEFAULT_FONT or "未找到中文字体",
+            "cosyvoice_ready": bool(DASHSCOPE_API_KEY),
+            "volcengine_ready": bool(VOLC_TTS_APPID and VOLC_TTS_TOKEN)}
 
 
 @app.post("/api/v1/drafts")
@@ -261,7 +266,7 @@ async def media_probe(url: str):
 @app.post("/api/v1/ai/tts")
 async def ai_tts(req: TTSReq):
     try:
-        result = await synthesize(req.text, req.voice, req.engine)
+        result = await synthesize(req.text, req.voice, req.engine, req.model)
     except TTSError as e:
         raise HTTPException(502, str(e))
     result["file_url"] = "/files/" + str(Path(result["file_path"]).relative_to(DATA_DIR))
@@ -305,6 +310,39 @@ async def get_render_task(task_id: str):
     if not job:
         raise HTTPException(404, f"渲染任务不存在: {task_id}")
     return job
+
+
+
+
+# ---------------- 声音克隆（CosyVoice zero-shot 复刻） ----------------
+class CloneReq(BaseModel):
+    name: str = ""
+    audio_base64: str
+    model: Optional[str] = None
+
+
+@app.post("/api/v1/ai/voice/clone")
+async def ai_voice_clone(req: CloneReq):
+    """用参考录音克隆音色并登记，供 TTS 的 voice 参数使用。"""
+    try:
+        return voiceclone.clone_voice(req.name, req.audio_base64, req.model)
+    except voiceclone.VoiceCloneError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(502, f"声音克隆失败: {e}"[:500])
+
+
+@app.get("/api/v1/ai/voices")
+async def ai_voices():
+    return {"voices": voiceclone.list_voices()}
+
+
+@app.delete("/api/v1/ai/voices/{voice_id}")
+async def ai_voice_delete(voice_id: str):
+    try:
+        return voiceclone.delete_voice(voice_id)
+    except Exception as e:
+        raise HTTPException(502, f"删除失败: {e}"[:500])
 
 
 ensure_dirs()

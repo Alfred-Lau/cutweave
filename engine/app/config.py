@@ -40,7 +40,25 @@ FONT_CANDIDATES = [
     "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",   # 部分发行版路径
 ]
 
+# ---- 火山引擎豆包语音（大模型语音合成；复刻音色 S_ 声音ID 直接当 voice 用）----
+VOLC_TTS_APPID = os.environ.get("VOLC_TTS_APPID", "")
+VOLC_TTS_TOKEN = os.environ.get("VOLC_TTS_TOKEN", "")
+VOLC_TTS_CLUSTER = os.environ.get("LG_VOLC_CLUSTER", "volcano_tts")
+VOLC_TTS_VOICE = os.environ.get("LG_VOLC_VOICE", "")  # 缺省音色（官方音色名或复刻声音ID）
+
 API_PREFIX = "/api/v1"
+
+# ---- AI 语音（阿里百炼 DashScope：CosyVoice 合成/声音复刻）----
+DASHSCOPE_API_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
+DASHSCOPE_WORKSPACE_ID = os.environ.get("DASHSCOPE_WORKSPACE_ID", "")  # 默认业务空间可留空
+COSYVOICE_MODEL = os.environ.get("LG_COSYVOICE_MODEL", "cosyvoice-v3-flash")
+
+# ---- OSS 中转（声音复刻的参考音频需公网 URL；ECS 内网 endpoint 上传免流量费）----
+OSS_BUCKET = os.environ.get("OSS_BUCKET", "")
+OSS_ENDPOINT = os.environ.get("OSS_ENDPOINT", "")  # 例 https://oss-cn-wulanchabu-internal.aliyuncs.com
+OSS_ACCESS_KEY_ID = os.environ.get("OSS_ACCESS_KEY_ID", "")
+OSS_ACCESS_KEY_SECRET = os.environ.get("OSS_ACCESS_KEY_SECRET", "")
+OSS_OBJECT_PREFIX = os.environ.get("OSS_OBJECT_PREFIX", "cutweave/clone-tmp/")
 
 
 def ensure_dirs() -> None:

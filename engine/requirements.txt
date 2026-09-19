@@ -6,3 +6,5 @@ httpx
 pytest
 python-multipart
 Pillow
+dashscope
+oss2
